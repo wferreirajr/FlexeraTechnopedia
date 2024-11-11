@@ -1,0 +1,47 @@
+{
+    "data": {
+        "SoftwareProduct": [
+            {
+                "application": "Microsoft Internet Information Services (IIS) Manager for Remote Administration",
+                "description": "Microsoft Internet Information Services (IIS) Manager for Remote Administration allows remote management of web servers running IIS. It provides a graphical user interface for managing websites, virtual directories, applications, and other IIS settings. It enables administrators to remotely control and monitor web servers, making it convenient for managing multiple servers from a single location.",
+                "manufacturer": {
+                    "description": "Microsoft Corporation develops, manufactures, licenses and supports a range of software products for computing devices. (Google Finance: http://www.google.com/finance?q=NASDAQ%3AMSFT)",
+                    "name": "Microsoft"
+                },
+                "name": "Internet Information Services (IIS) Manager for Remote Administration",
+                "softwareReleases": [
+                    {
+                        "application": "Microsoft Internet Information Services (IIS) Manager for Remote Administration 1 (1.0)",
+                        "name": "Internet Information Services (IIS) Manager for Remote Administration",
+                        "softwareLifecycle": {
+                            "endOfLife": "Not Available",
+                            "endOfLifeCalculatedCase": "",
+                            "endOfLifeException": "Date not published by vendor",
+                            "endOfLifeSupportLevel": "Mainstream Support",
+                            "obsolete": "Not Available"
+                        }
+                    },
+                    {
+                        "application": "Microsoft Internet Information Services (IIS) Manager for Remote Administration 1 (1.2)",
+                        "name": "Internet Information Services (IIS) Manager for Remote Administration",
+                        "softwareLifecycle": {
+                            "endOfLife": "Not Available",
+                            "endOfLifeCalculatedCase": "",
+                            "endOfLifeException": "Date not published by vendor",
+                            "endOfLifeSupportLevel": "Mainstream Support",
+                            "obsolete": "Not Available"
+                        }
+                    }
+                ],
+                "softwareVersions": [
+                    {
+                        "name": "1.0"
+                    },
+                    {
+                        "name": "1.2"
+                    }
+                ]
+            }
+        ]
+    }
+}

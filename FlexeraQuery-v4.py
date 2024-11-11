@@ -7,15 +7,27 @@ Criar a variável do token de acesso:
     - export FLEXERA_API_TOKEN="<TOKEN>"
 """
 import requests
-import os
 import json
 import csv
+import argparse
 
-# Obtendo o token de acesso da variável de ambiente
-REFRESH_TOKEN = os.getenv("FLEXERA_API_TOKEN")
+# Configura o analisador de argumentos
+parser = argparse.ArgumentParser(description="Script para consultar a API Flexera.")
+parser.add_argument("--token", required=True, help="Token de atualização da API Flexera.")
+parser.add_argument("--product", required=True, help="Nome do produto de software para consulta.")
+parser.add_argument("--output", help="Caminho do arquivo CSV para salvar os resultados.")
 
-# Variável de texto para pesquisa do SoftwareProduct
-SOFTWARE_PRODUCT_NAME = "Internet Information Services (IIS) Manager for Remote Administration"
+# Analisa os argumentos
+args = parser.parse_args()
+
+# Valida se os parâmetros estão em branco
+if not args.token or not args.product:
+    print("Os parâmetros 'token' e 'product' são obrigatórios.")
+    exit(1)
+
+# Obtendo o token de acesso e o nome do produto de software dos argumentos
+REFRESH_TOKEN = args.token
+SOFTWARE_PRODUCT_NAME = args.product
 
 # Valida se o token de acesso foi informado
 if not REFRESH_TOKEN:
@@ -104,10 +116,13 @@ response = requests.post(url, headers=headers, data=data)
 
 if response.status_code == 200:
     # print(json.dumps(response.json(), indent=4))
+    with open("response.json", "w") as json_file:
+        json.dump(response.json(), json_file, indent=4)
+
     response_data = response.json()
 
     # Define o caminho do arquivo CSV
-    csv_file_path = "./FlexeraQueryResults.csv"
+    csv_file_path = args.output or f"{SOFTWARE_PRODUCT_NAME}.csv"
 
     # Extrai os dados relevantes
     software_products = response_data.get("data", {}).get("SoftwareProduct", [])
