@@ -6,23 +6,44 @@ import argparse
 from fuzzywuzzy import process
 from colorama import init, Fore
 
-# Inicializa o colorama
+# Inicializa o colorama para saída colorida no terminal
 init(autoreset=True)
 
-# Constantes
-ORGANIZATION_ID = "XXXXX"
-CSV_FILE_PATH = "techs.csv"
-OUTPUT_CSV_FILE = "output.csv"
-
-# Função para obter argumentos da linha de comando
 def get_args():
+    """
+    Configura e processa os argumentos da linha de comando.
+    
+    Returns:
+        argparse.Namespace: Objeto contendo os argumentos processados.
+    """
     parser = argparse.ArgumentParser(description="Script para consultar a API Flexera.")
     parser.add_argument("--token", required=True, help="Token de atualização da API Flexera.")
+    parser.add_argument("--OrgId", required=True, help="Número da OrgID para uso da API Flexera.")
+    parser.add_argument("--InputFile", required=False, help="Nome da tecnologia a ser pesquisada.")
+    parser.add_argument("--OutputFile", required=False, help="Nome do arquivo de saída.")
     return parser.parse_args()
 
-# Função para obter o token da API Flexera
+args = get_args()
+ORGANIZATION_ID = args.OrgId
+CSV_FILE_PATH = args.InputFile if args.InputFile else "techs.csv"
+OUTPUT_CSV_FILE = args.OutputFile if args.OutputFile else "output.csv"
+
 def get_flexera_token(refresh_token, current_token=None):
+    """
+    Obtém ou atualiza o token de acesso da API Flexera.
+    
+    Args:
+        refresh_token (str): Token de atualização para obter um novo token de acesso.
+        current_token (str, optional): Token de acesso atual para verificar validade.
+    
+    Returns:
+        str: Token de acesso válido.
+    
+    Raises:
+        Exception: Se falhar ao obter um novo token.
+    """
     if current_token:
+        # Verifica se o token atual ainda é válido
         url = f"https://api.flexera.com/content/v2/orgs/{ORGANIZATION_ID}/graphql"
         headers = {
             "Authorization": f"Bearer {current_token}",
@@ -35,6 +56,7 @@ def get_flexera_token(refresh_token, current_token=None):
             return current_token
         print("O token atual está expirado, gerando um novo token.")
 
+    # Obtém um novo token
     url = "https://login.flexera.com/oidc/token"
     headers = {"Content-Type": "application/x-www-form-urlencoded"}
     data = {"grant_type": "refresh_token", "refresh_token": refresh_token}
@@ -45,9 +67,21 @@ def get_flexera_token(refresh_token, current_token=None):
         return new_token
     raise Exception(f"Falha ao obter o token com código de status {response.status_code}: {response.text}")
 
-# Função para obter informações do produto
 def get_product(software_product_name, token):
-    check_filename = f"output_{software_product_name}.json"
+    """
+    Obtém informações do produto de software da API Flexera.
+    
+    Args:
+        software_product_name (str): Nome do produto de software.
+        token (str): Token de acesso para a API Flexera.
+    
+    Returns:
+        str: Caminho do arquivo JSON com as informações do produto, ou None se falhar.
+    """
+    if not os.path.exists("output_json"):
+        os.makedirs("output_json")
+
+    check_filename = os.path.join("output_json",f"output_{software_product_name}.json")
     if os.path.exists(check_filename):
         return check_filename
 
@@ -83,12 +117,7 @@ def get_product(software_product_name, token):
         }}
     }}
     """
-    # NÃO ESTÁ FUNCIONANDO
-    params = {
-        "filter": "(name eq 'WILSON')"
-    }
-
-    response = requests.post(url, headers=headers, data=json.dumps({"query": query}), params=params)
+    response = requests.post(url, headers=headers, data=json.dumps({"query": query}))
     if response.status_code == 200:
         data = response.json()
         with open(check_filename, "w", encoding="utf-8") as file:
@@ -97,24 +126,34 @@ def get_product(software_product_name, token):
     print(f"A consulta falhou com o código de status {response.status_code}: {response.text}")
     return None
 
-# Função principal
 def main():
+    """
+    Função principal que executa o fluxo do script.
+    """
     args = get_args()
     token = get_flexera_token(args.token)
     
     try:
+        # Carrega as tecnologias únicas do arquivo CSV
+        unique_techs = set()
+        techs = []
+
         with open(CSV_FILE_PATH, mode='r') as file:
             reader = csv.reader(file, delimiter=';')
-            next(reader)
-            techs = [row for row in reader]
-        print(f"Arquivo CSV ({CSV_FILE_PATH}) carregado com sucesso.")
+            next(reader)  # Pula o cabeçalho
+            for row in reader:
+                tech_name = row[0]
+                if tech_name not in unique_techs:
+                    unique_techs.add(tech_name)
+                    techs.append(row)
+        
+        print(f"Arquivo CSV ({CSV_FILE_PATH}) carregado com sucesso. {len(techs)} techs únicas encontradas.")
     except FileNotFoundError:
         print(f"Arquivo CSV ({CSV_FILE_PATH}) não encontrado.")
-        return
 
     for tech in techs:
         tech_name = tech[0]
-
+        # Remove caracteres não alfanuméricos do nome da tecnologia
         tech_name = ''.join(e if e.isalnum() or e.isspace() else ' ' for e in tech_name)
 
         json_file_path = get_product(tech_name, token)
@@ -129,7 +168,9 @@ def main():
             print(Fore.RED + "O retorno foi vazio. Nenhum produto de software encontrado." + Fore.RESET)
             continue
 
+        # Extrai os nomes das versões de software
         names = [release['name'] for product in software_products for release in product.get('softwareReleases', [])]
+        # Encontra a correspondência mais próxima usando fuzzy matching
         result = process.extractOne(tech_name, names, score_cutoff=70)
 
         if result:
