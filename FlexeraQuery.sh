@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Chamada via curl
-# curl https://api.flexera.com/content/v2/orgs/36101/graphql -H "Authorization: Bearer $TOKEN" -d '{"query": "query SoftwareProductList {Manufacturer(name: \"Microsoft\") {id  name softwareProducts {id name }}\n}"}'
+# curl https://api.flexera.com/content/v2/orgs/XXXXX/graphql -H "Authorization: Bearer $TOKEN" -d '{"query": "query SoftwareProductList {Manufacturer(name: \"Microsoft\") {id  name softwareProducts {id name }}\n}"}'
 
 # Verifica se o parâmetro foi passado
 if [ -z "$1" ]; then
@@ -14,7 +14,7 @@ token=$1
 
 #!/bin/bash
 
-ORGANIZATION_ID="36101"
+ORGANIZATION_ID="XXXXX"
 
 get_flexera_token() {
     local refresh_token=$1

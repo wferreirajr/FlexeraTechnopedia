@@ -10,7 +10,7 @@ from colorama import init, Fore
 init(autoreset=True)
 
 # Constantes
-ORGANIZATION_ID = "36101"
+ORGANIZATION_ID = "XXXXX"
 CSV_FILE_PATH = "techs.csv"
 OUTPUT_CSV_FILE = "output.csv"
 
