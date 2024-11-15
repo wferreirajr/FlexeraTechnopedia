@@ -83,8 +83,12 @@ def get_product(software_product_name, token):
         }}
     }}
     """
+    # NÃO ESTÁ FUNCIONANDO
+    params = {
+        "filter": "(name eq 'WILSON')"
+    }
 
-    response = requests.post(url, headers=headers, data=json.dumps({"query": query}))
+    response = requests.post(url, headers=headers, data=json.dumps({"query": query}), params=params)
     if response.status_code == 200:
         data = response.json()
         with open(check_filename, "w", encoding="utf-8") as file:
