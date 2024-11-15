@@ -29,3 +29,11 @@ Para executar o script Python, use o seguinte comando:
 
 ```sh
 python FlexeraQuery.py --token <TOKEN_DE_ATUALIZACAO>
+
+### Script Bash
+
+Para executar o script Bash, use o seguinte comando:
+
+```sh
+chmod +x FlexeraQuery.sh
+./FlexeraQuery.sh <TOKEN_DE_ATUALIZACAO>
