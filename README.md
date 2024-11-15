@@ -28,7 +28,8 @@ Este projeto contém scripts para consultar a API Flexera e obter informações 
 Para executar o script Python, use o seguinte comando:
 
 ```sh
-python FlexeraQuery.py --token <TOKEN_DE_ATUALIZACAO>
+python FlexeraQuery.py --token TOKEN
+```
 
 ### Script Bash
 
@@ -36,4 +37,5 @@ Para executar o script Bash, use o seguinte comando:
 
 ```sh
 chmod +x FlexeraQuery.sh
-./FlexeraQuery.sh <TOKEN_DE_ATUALIZACAO>
+./FlexeraQuery.sh TOKEN
+```
