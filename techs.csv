@@ -1,7 +1,8 @@
-tecnologia,fabricante,versao
-Canonical Ubuntu 23 (23.04),ubuntu,23.04
-Ubuntu 24,Canonical,24.04
-Ubuntu,Canonical,24.04
-Internet Information Services (IIS) Manager for Remote Administration,Microsoft,1.2
-Internet Information Services,Microsoft,1.0
-Remote Administration,Microsoft,1.2
+tecnologia;fabricante;versao
+Canonical Ubuntu 23 (23.04);ubuntu;23.04
+Ubuntu 24;Canonical;24.04
+Ubuntu;Canonical;24.04
+Internet Information Services (IIS) Manager for Remote Administration;Microsoft;1.2
+Internet Information Services;Microsoft;1.0
+Remote Administration;Microsoft;1.2
+Windows Server/2022;Microsoft;1.2
