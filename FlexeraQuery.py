@@ -90,34 +90,62 @@ def get_product(software_product_name, token):
         "Authorization": f"Bearer {token}",
         "Content-Type": "application/json"
     }
-    query = f"""
-    query SoftwareProductList {{
-        SoftwareProduct(name: "{software_product_name}") {{
-            application
-            name
-            description
-            manufacturer {{
+
+    query = json.dumps({ 
+        "query": f"""
+        query SoftwareProductList {{
+            SoftwareProduct(name: "{software_product_name}") {{
+                application
                 name
                 description
-            }}
-            softwareReleases {{
-                name
-                application
-                softwareLifecycle {{
-                    endOfLife
-                    endOfLifeCalculatedCase
-                    endOfLifeException
-                    endOfLifeSupportLevel
-                    obsolete
+                manufacturer {{
+                    name
+                    description
+                }}
+                softwareReleases {{
+                    name
+                    application
+                    softwareLifecycle {{
+                        endOfLife
+                        endOfLifeCalculatedCase
+                        endOfLifeException
+                        endOfLifeSupportLevel
+                        obsolete
+                    }}
+                }}
+                softwareVersions {{
+                    name
                 }}
             }}
-            softwareVersions {{
+        }}
+        """
+    })
+
+    query1 = json.dumps({ 
+        "query": f"""
+        query SoftwareProductList {{
+            Manufacturer(name: "{software_product_name}") {{
                 name
+                softwareProducts {{
+                    name
+                }}
             }}
         }}
-    }}
-    """
-    response = requests.post(url, headers=headers, data=json.dumps({"query": query}))
+        """
+    })
+
+    query2 = json.dumps({ 
+        "query": f"""
+        query SoftwareProductList {{
+            SoftwareRelease(application: "{software_product_name}") {{
+                name
+                application
+            }}
+        }}
+        """
+    })
+
+    response = requests.post(url, headers=headers, data=query)
     if response.status_code == 200:
         data = response.json()
         with open(check_filename, "w", encoding="utf-8") as file:
@@ -154,7 +182,7 @@ def main():
     for tech in techs:
         tech_name = tech[0]
         # Remove caracteres não alfanuméricos do nome da tecnologia
-        tech_name = ''.join(e if e.isalnum() or e.isspace() else ' ' for e in tech_name)
+        #tech_name = ''.join(e if e.isalnum() or e.isspace() else ' ' for e in tech_name)
 
         json_file_path = get_product(tech_name, token)
         if not json_file_path:
@@ -165,7 +193,7 @@ def main():
 
         software_products = data.get('data', {}).get('SoftwareProduct', [])
         if not software_products:
-            print(Fore.RED + "O retorno foi vazio. Nenhum produto de software encontrado." + Fore.RESET)
+            print(Fore.RED + f"O retorno da tech ({tech_name}) foi vazio." + Fore.RESET)
             continue
 
         # Extrai os nomes das versões de software
