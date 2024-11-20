@@ -138,6 +138,7 @@ def get_product(software_product_name, token):
         "query": f"""
         query SoftwareProductList {{
             SoftwareRelease(application: "{software_product_name}") {{
+                id
                 name
                 application
             }}
@@ -145,7 +146,7 @@ def get_product(software_product_name, token):
         """
     })
 
-    response = requests.post(url, headers=headers, data=query)
+    response = requests.post(url, headers=headers, data=query2)
     if response.status_code == 200:
         data = response.json()
         with open(check_filename, "w", encoding="utf-8") as file:
