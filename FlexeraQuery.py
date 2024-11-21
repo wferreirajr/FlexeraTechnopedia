@@ -21,6 +21,7 @@ def get_args():
     parser.add_argument("--OrgId", required=True, help="Número da OrgID para uso da API Flexera.")
     parser.add_argument("--InputFile", required=False, help="Nome da tecnologia a ser pesquisada.")
     parser.add_argument("--OutputFile", required=False, help="Nome do arquivo de saída.")
+    parser.add_argument("--SearchType", required=True, help="Tipo de pesquisa a ser realizada.")
     return parser.parse_args()
 
 args = get_args()
@@ -91,62 +92,63 @@ def get_product(software_product_name, token):
         "Content-Type": "application/json"
     }
 
-    query = json.dumps({ 
-        "query": f"""
-        query SoftwareProductList {{
-            SoftwareProduct(name: "{software_product_name}") {{
-                application
-                name
-                description
-                manufacturer {{
+    if args.SearchType == "Manufacturer":
+        query = json.dumps({ 
+            "query": f"""
+            query SoftwareProductList {{
+                Manufacturer(name: "{software_product_name}") {{
                     name
-                    description
-                }}
-                softwareReleases {{
-                    name
-                    application
-                    softwareLifecycle {{
-                        endOfLife
-                        endOfLifeCalculatedCase
-                        endOfLifeException
-                        endOfLifeSupportLevel
-                        obsolete
+                    softwareProducts {{
+                        name
                     }}
                 }}
-                softwareVersions {{
+            }}
+            """
+        })
+    elif args.SearchType == "SoftwareRelease":
+        query = json.dumps({ 
+            "query": f"""
+            query SoftwareProductList {{
+                SoftwareRelease(application: "{software_product_name}") {{
+                    id
                     name
+                    application
                 }}
             }}
-        }}
-        """
-    })
-
-    query1 = json.dumps({ 
-        "query": f"""
-        query SoftwareProductList {{
-            Manufacturer(name: "{software_product_name}") {{
-                name
-                softwareProducts {{
+            """
+        })
+    elif args.SearchType == "SoftwareProduct":
+        query = json.dumps({ 
+            "query": f"""
+            query SoftwareProductList {{
+                SoftwareProduct(name: "{software_product_name}") {{
+                    application
                     name
+                    description
+                    manufacturer {{
+                        name
+                        description
+                    }}
+                    softwareReleases {{
+                        name
+                        application
+                        softwareLifecycle {{
+                            endOfLife
+                            endOfLifeCalculatedCase
+                            endOfLifeException
+                            endOfLifeSupportLevel
+                            obsolete
+                        }}
+                    }}
+                    softwareVersions {{
+                        name
+                    }}
                 }}
             }}
-        }}
-        """
-    })
+            """
+        })
 
-    query2 = json.dumps({ 
-        "query": f"""
-        query SoftwareProductList {{
-            SoftwareRelease(application: "{software_product_name}") {{
-                id
-                name
-                application
-            }}
-        }}
-        """
-    })
-
-    response = requests.post(url, headers=headers, data=query2)
+    response = requests.post(url, headers=headers, data=query)
     if response.status_code == 200:
         data = response.json()
         with open(check_filename, "w", encoding="utf-8") as file:
