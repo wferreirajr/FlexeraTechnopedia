@@ -96,10 +96,23 @@ def get_product(software_product_name, token):
         query = json.dumps({ 
             "query": f"""
             query SoftwareProductList {{
-                Manufacturer(name: "{software_product_name}") {{
+                Manufacturer(name: "{software_product_name}, take: 25000") {{
                     name
+                    description
                     softwareProducts {{
+                        application
                         name
+                        softwareReleases {{
+                            name
+                            application
+                            softwareLifecycle {{
+                                endOfLife
+                                endOfLifeCalculatedCase
+                                endOfLifeException
+                                endOfLifeSupportLevel
+                                obsolete
+                            }}
+                        }}
                     }}
                 }}
             }}
@@ -110,7 +123,6 @@ def get_product(software_product_name, token):
             "query": f"""
             query SoftwareProductList {{
                 SoftwareRelease(application: "{software_product_name}") {{
-                    id
                     name
                     application
                 }}
